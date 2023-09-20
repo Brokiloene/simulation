@@ -1,7 +1,8 @@
 import itertools
 import random
+import time
 
-from bfs import BFS
+from coordinates import Coordinates
 from terrain import Rock, Tree, Grass
 from animals import Herbivore, Predator
 
@@ -21,11 +22,11 @@ class SimulationRenderer:
         print(*[x for x in list(map(lambda x: ' ' + str(x) + ' ', range(self.simulation.board_size_y)))], sep='')
         
         print(row_cnt, end='')
-        for cord in coordinates:
-            if cord in self.simulation.animal_graph:
-                print(self.simulation.animal_graph[cord], end='')
-            elif cord in self.simulation.terrain_graph:
-                print(self.simulation.terrain_graph[cord], end='')
+        for coordinate in coordinates:
+            if coordinate in self.simulation.animal_graph:
+                print(self.simulation.animal_graph[coordinate], end='')
+            elif coordinate in self.simulation.terrain_graph:
+                print(self.simulation.terrain_graph[coordinate], end='')
             else:
                 print('   ', end='')
             
@@ -36,9 +37,6 @@ class SimulationRenderer:
                 row_cnt += 1
                 if row_cnt < self.simulation.board_size_x:
                     print(row_cnt, end='')
-
-
-
 
 
 class Simulation:
@@ -56,46 +54,85 @@ class Simulation:
         self.available_animals = [Herbivore, Predator]
 
         self.renderer = SimulationRenderer(self)
+    
+    def set_test(self):
+        self.animal_graph[Coordinates(0, 0)] = Herbivore(Coordinates(0, 0), Coordinates(self.board_size_x, self.board_size_y), 2, self.terrain_graph, self.animal_graph)
+        self.animal_graph[Coordinates(9, 0)] = Predator(Coordinates(9, 0), Coordinates(self.board_size_x, self.board_size_y), 3, self.terrain_graph, self.animal_graph)
+        
+        self.terrain_graph[Coordinates(9, 9)] = Grass(Coordinates(9, 9), Coordinates(self.board_size_x, self.board_size_y))
 
-    def set_objects(self):
+        for coordinate in self.all_possible_coordinates:
+            terrain_args = (
+                            coordinate, 
+                            Coordinates(self.board_size_x, self.board_size_y)
+                           )
+        
+        self.render()
+
+    def set_random(self):
         possible_coordinates = self.all_possible_coordinates
         
         # животных не должно быть слишком много
         coordinates_for_animals = (random.choices
-        (possible_coordinates, k=random.randint(1, self.board_size // 2)) )
+        (possible_coordinates, k=random.randint(1, self.board_size // 4)) )
         
         coordinates_for_terrain = (random.choices
         (possible_coordinates, k=random.randint(self.board_size // 2, self.board_size)) )
         
-        for cord in coordinates_for_animals:
-            animals_to_set = random.choices(self.available_animals, [3, 1], k=len(coordinates_for_animals))
+        for coordinate in coordinates_for_animals:
+            animals_to_set = random.choices(self.available_animals, [5, 1], k=len(coordinates_for_animals))
             for animal in animals_to_set:
                 speed = random.randint(1, 3)
-                animal_args = (*cord, self.board_size_x, self.board_size_y, speed, self.terrain_graph, self.animal_graph)
-                self.animal_graph[cord] = animal(*animal_args)
+                animal_args = (
+                                coordinate, 
+                                Coordinates(self.board_size_x, self.board_size_y), 
+                                speed, 
+                                self.terrain_graph, 
+                                self.animal_graph
+                              )
+                self.animal_graph[coordinate] = animal(*animal_args)
 
-        for cord in coordinates_for_terrain:
-            terrain_args = (*cord, self.board_size_x, self.board_size_y)
-            self.terrain_graph[cord] = random.choice(self.available_terrain)(*terrain_args)
+        for coordinate in coordinates_for_terrain:
+            terrain_args = (
+                            coordinate, 
+                            Coordinates(self.board_size_x, self.board_size_y)
+                           )
+            self.terrain_graph[coordinate] = random.choice(self.available_terrain)(*terrain_args)
+
+        self.render()
         
     def render(self):
         self.renderer.render()
+
+    def next_turn(self):
+        self.turns_cnt += 1
+        print("TURN: ", self.turns_cnt)
+
+        # map(lambda x: x.make_move(), self.animal_graph.values())
+        for animal in list(self.animal_graph.values()):
+            animal.make_move()
+        self.render()
     
     @property
     def all_possible_coordinates(self):
-        return list(itertools.product([x for x in range(self.board_size_x)], 
-                                 [y for y in range(self.board_size_y)]))
-
-
-
-    
-
+        """
+        Лист кортежей всех координат всех клеток поля
+        """
+        return [ Coordinates(*x) for x in itertools.product
+            ([*range(self.board_size_x)], [*range(self.board_size_y)]) ]
+        
 
 if __name__ == '__main__':
+    
     sim = Simulation(10, 10)
-    sim.set_objects()
-    sim.render()
+    sim.set_random()
+    
+    while True:
+        time.sleep(1)
+        sim.next_turn()
+
     x=1
 
-# todo: Движение животных -- если цель найдена, подойти к ней как можно ближе
-#       если не найдена -- сделать случайный ход из возможных
+# TODO: счетчик животных и хищников
+# TODO: спаун травы если ее мало осталось
+# TODO: решить проблему с исчезающими хищниками
