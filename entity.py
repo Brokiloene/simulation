@@ -6,6 +6,9 @@ class Entity:
     """
     Базовый класс. Хранит свои координаты и размеры игровой доски.
     """
+
+    ANSI_RESET = "\033[0m"
+
     def __init__(self, x, y, board_size_x, board_size_y) -> None:
         self.pos_x = x
         self.pos_y = y
@@ -35,8 +38,8 @@ class Entity:
     def coordinates(self):
         return (self.pos_x, self.pos_y)
     
-    def __str__(self) -> str:
-        return f"Entity: ({self.pos_x}, {self.pos_y})"
+    # def __str__(self) -> str:
+    #     return f"Entity: ({self.pos_x}, {self.pos_y})"
     
-    def __repr__(self) -> str:
-        return f"Entity({self.pos_x}, {self.pos_y}, {self.board_size_x}, {self.board_size_y})"
+    # def __repr__(self) -> str:
+    #     return f"Entity({self.pos_x}, {self.pos_y}, {self.board_size_x}, {self.board_size_y})"
