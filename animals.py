@@ -71,6 +71,8 @@ class Herbivore(Animal):
                     
         # если нет цели или до неё не дойти, сделать случайный ход
         possible_moves = list(filter(self.is_coordinates_free_to_move, possible_moves))
+        if not possible_moves:
+            return
         new_coordinates = random.choice(possible_moves)
         del self.animal_graph[self.coordinates]
         self.animal_graph[new_coordinates] = self
@@ -113,6 +115,8 @@ class Predator(Animal):
                     
         # если нет цели или до неё не дойти, сделать случайный ход
         possible_moves = list(filter(self.is_coordinates_free_to_move, possible_moves))
+        if not possible_moves:
+            return
         new_coordinates = random.choice(possible_moves)
         del self.animal_graph[self.coordinates]
         self.animal_graph[new_coordinates] = self

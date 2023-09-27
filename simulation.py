@@ -56,10 +56,13 @@ class Simulation:
         self.renderer = SimulationRenderer(self)
     
     def set_test(self):
-        self.animal_graph[Coordinates(0, 0)] = Herbivore(Coordinates(0, 0), Coordinates(self.board_size_x, self.board_size_y), 2, self.terrain_graph, self.animal_graph)
-        self.animal_graph[Coordinates(9, 0)] = Predator(Coordinates(9, 0), Coordinates(self.board_size_x, self.board_size_y), 3, self.terrain_graph, self.animal_graph)
+        self.animal_graph[Coordinates(1, 0)] = Herbivore(Coordinates(0, 0), Coordinates(self.board_size_x, self.board_size_y), 2, self.terrain_graph, self.animal_graph)
+        self.animal_graph[Coordinates(0, 1)] = Herbivore(Coordinates(0, 1), Coordinates(self.board_size_x, self.board_size_y), 2, self.terrain_graph, self.animal_graph)
+        self.animal_graph[Coordinates(1, 1)] = Herbivore(Coordinates(1, 1), Coordinates(self.board_size_x, self.board_size_y), 2, self.terrain_graph, self.animal_graph)
+
+        self.animal_graph[Coordinates(0, 0)] = Predator(Coordinates(0, 0), Coordinates(self.board_size_x, self.board_size_y), 3, self.terrain_graph, self.animal_graph)
         
-        self.terrain_graph[Coordinates(9, 9)] = Grass(Coordinates(9, 9), Coordinates(self.board_size_x, self.board_size_y))
+        self.terrain_graph[Coordinates(0, 0)] = Grass(Coordinates(0, 0), Coordinates(self.board_size_x, self.board_size_y))
 
         for coordinate in self.all_possible_coordinates:
             terrain_args = (
@@ -105,12 +108,19 @@ class Simulation:
         self.renderer.render()
 
     def next_turn(self):
+
         self.turns_cnt += 1
         print("TURN: ", self.turns_cnt)
 
         # map(lambda x: x.make_move(), self.animal_graph.values())
         for animal in list(self.animal_graph.values()):
-            animal.make_move()
+            if animal in self.animal_graph.values():
+                animal.make_move()
+        
+        if sum(isinstance(x, Grass) for x in self.terrain_graph) == 0:
+            self.spawn_grass()
+        if sum(isinstance(x, Herbivore) for x in self.animal_graph) == 0:
+            self.spawn_herbivore()
         self.render()
     
     @property
@@ -120,7 +130,18 @@ class Simulation:
         """
         return [ Coordinates(*x) for x in itertools.product
             ([*range(self.board_size_x)], [*range(self.board_size_y)]) ]
-        
+    
+    def spawn_grass(self):
+        possible_coordinates = list(filter(lambda x: x not in self.terrain_graph, self.all_possible_coordinates))
+        if possible_coordinates:
+            coordinates = random.choice(possible_coordinates)
+            self.terrain_graph[coordinates] = Grass(coordinates, Coordinates(self.board_size_x, self.board_size_y))
+
+    def spawn_herbivore(self):
+        possible_coordinates = list(filter(lambda x: x not in self.animal_graph, self.all_possible_coordinates))
+        if possible_coordinates:
+            coordinates = random.choice(possible_coordinates)
+            self.animal_graph[coordinates] = Herbivore(coordinates, Coordinates(self.board_size_x, self.board_size_y), 2, self.terrain_graph, self.animal_graph)
 
 if __name__ == '__main__':
     
@@ -132,7 +153,3 @@ if __name__ == '__main__':
         sim.next_turn()
 
     x=1
-
-# TODO: счетчик животных и хищников
-# TODO: спаун травы если ее мало осталось
-# TODO: решить проблему с исчезающими хищниками
