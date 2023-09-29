@@ -1,7 +1,7 @@
 class Coordinate:
-    def __init__(self, x, y) -> None:
-        self.x = x
-        self.y = y
+    def __init__(self, row, col) -> None:
+        self.row = row
+        self.col = col
 
     @classmethod
     def from_coordinate(cls, other):
@@ -9,14 +9,14 @@ class Coordinate:
     
     @property
     def values(self):
-        return (self.x, self.y)
+        return (self.row, self.col)
     
     @property
     def prod(self):
         """
         Возвращает произведение координат
         """
-        return self.x * self.y
+        return self.row * self.col
     
     def __hash__(self) -> int:
         return hash(self.values)
@@ -32,32 +32,20 @@ class Coordinate:
         Используется для проверки того, что координаты не выходят за границы карты
         Из-за индексации с 0 неравенство строгое
         """
-        return self.x < other.x and self.y < other.y
+        return self.row < other.row and self.col < other.col
     
     def __ge__(self, other):
         """
         Используется для проверки того, что координаты не выходят за границы карты
         """
-        return self.x >= other.x and self.y >= other.y
+        return self.row >= other.row and self.col >= other.col
     
     def __add__(self, other):
-        return Coordinate(self.x + other.x, self.y + other.y)
+        return Coordinate(self.row + other.row, self.col + other.col)
     
     def __str__(self):
         return str(self.values)
     
-    def neighbor_coordinates(self, board_size):
-        """
-        Вернёт список объектов Coordinate -- координаты клеток-соседей self
-        """
-        neighbor_coordinates = []
-
-        for shift in ((1, 0), (0, 1), (1, 1), (-1, 0), (0, -1), (-1, -1), (-1, 1), (1, -1)):
-            cur = Coordinate(self.x + shift[0], self.y + shift[1])
-            if Coordinate(0, 0) <= cur < board_size:   
-               neighbor_coordinates.append(cur)
-
-        return neighbor_coordinates
 
 if __name__ == '__main__':
     a1 = Coordinate(0, 0)

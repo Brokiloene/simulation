@@ -2,10 +2,10 @@ import abc
 
 
 class Entity(abc.ABC):
-    def __init__(self, coordinates, board_size) -> None:
+    def __init__(self, coordinate) -> None:
         self._sprite = None
-        self.coordinates = coordinates
-        self.board_size = board_size
+        self.crd = coordinate
+
 
     @property
     def sprite(self):
