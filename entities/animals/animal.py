@@ -1,22 +1,43 @@
 import random
 import itertools
-import abc
 
 from utils import Coordinate
 from entities import Entity, Terrain, Rock
+from utils import AStar, Bfs
 
 
 
 class Animal(Entity):
-    def __init__(self, coordinate, board_map, speed) -> None:
+    def __init__(self, coordinate, board_map, search_algorithm, speed=0) -> None:
         super().__init__(coordinate)
         self.map = board_map
         self.speed = speed
+        self.search_algo = search_algorithm
+
+        self.search_algorithms = {"BFS": Bfs.search, "A*": AStar.search}
 
 
-    @abc.abstractmethod
+    def move_prepare(self):
+        return self.map.find_neares_object_crd(self.crd, self.target)
+
+
     def make_move(self):
-        pass
+        target_crd = self.move_prepare()
+
+        if target_crd is None:
+            self.make_random_move()
+            return
+
+        path_to_target = self.search_algorithms[self.search_algo](self.crd, target_crd, self.map)
+
+        new_coordinate = self.find_optimal_coordinate_to_move(path_to_target)
+            
+        if path_to_target and new_coordinate:
+            self.map.del_object(Animal, self.crd)
+            self.map.move_object(Animal, new_coordinate, self)
+            self.crd = new_coordinate
+        else:
+            self.make_random_move()
 
 
     def is_coordinate_free_to_move(self, coordinate):
@@ -43,6 +64,7 @@ class Animal(Entity):
     def is_move_on_straight_line(self, crd_start, crd_dest):
         return crd_start.row == crd_dest.row or crd_start.col == crd_dest.col \
             or abs(crd_start.row - crd_start.col) == abs(crd_dest.row - crd_dest.col)
+
 
     def is_move_on_straight_line_valid(self, crd_start, crd_dest):
         def get_coordinates_between(crd_start, crd_dest):
@@ -75,21 +97,22 @@ class Animal(Entity):
 
 
     def find_optimal_coordinate_to_move(self, path_to_target):
-        move_to_crd = path_to_target[0]
+        move_to_crd = None
         possible_moves = self.possible_move_coordinates
 
         for ind in range(min(self.speed, len(path_to_target))):
             new_crd = path_to_target[ind]
-            if new_crd in possible_moves and self.is_coordinate_free_to_move(new_crd) and \
-                (not self.is_move_on_straight_line(self.crd, new_crd) or
-                 self.is_move_on_straight_line_valid(self.crd, new_crd)):
+            if new_crd in possible_moves and self.is_coordinate_free_to_move(new_crd):
+            # and \
+                # (not self.is_move_on_straight_line(self.crd, new_crd) or
+                #  self.is_move_on_straight_line_valid(self.crd, new_crd)):
                 
                 move_to_crd = new_crd
             else:
                 return move_to_crd
             
         return move_to_crd
-    
+
 
     @property
     def possible_move_coordinates(self):
