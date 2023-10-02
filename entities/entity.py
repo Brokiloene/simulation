@@ -10,4 +10,3 @@ class Entity(abc.ABC):
     @property
     def sprite(self):
         return self._sprite
-

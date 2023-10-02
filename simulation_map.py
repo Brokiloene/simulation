@@ -23,7 +23,6 @@ class SimulationMap:
         self.animal_objects  = (Herbivore, Predator)
 
         self.passable_terrain = (Tree, Grass, type(None))
-    
 
     @property
     def bd_size_row(self):
@@ -32,8 +31,6 @@ class SimulationMap:
 
     @bd_size_row.setter
     def bd_size_row(self, board_size_row):
-        if self.bd_area < 66:
-            raise Exception("Map area must be greater than 65")
         self._bd_size_row = board_size_row
 
 
@@ -44,8 +41,6 @@ class SimulationMap:
 
     @bd_size_col.setter
     def bd_size_col(self, board_size_col):
-        if self.bd_area < 66:
-            raise Exception("Map area must be greater than 65")
         self._bd_size_col = board_size_col
 
 
@@ -60,7 +55,7 @@ class SimulationMap:
             raise Exception("Unknown search algorithm")
         self._search_algo = search_algorithm
 
-    
+
     def instantiate_object(self, graph_type, cls, coordinate):
         match graph_type.__name__:
             case Terrain.__name__:
@@ -73,43 +68,8 @@ class SimulationMap:
 
     def init_map_manual(self):
         # self.instantiate_object(Animal, Predator, Coordinate(0, 0))
-
-        self.instantiate_object(Animal, Herbivore, Coordinate(1, 0))
-        self.instantiate_object(Animal, Herbivore, Coordinate(0, 1))
-        self.instantiate_object(Animal, Herbivore, Coordinate(1, 1))
-        # self.instantiate_object(Animal, Herbivore, Coordinate(3, 0))
-        # self.instantiate_object(Animal, Herbivore, Coordinate(3, 1))
-        # self.instantiate_object(Animal, Herbivore, Coordinate(3, 2))
-        # self.instantiate_object(Animal, Herbivore, Coordinate(3, 3))
-
-        self.instantiate_object(Terrain, Rock, Coordinate(2, 0))
-        self.instantiate_object(Terrain, Rock, Coordinate(2, 1))
-        self.instantiate_object(Terrain, Rock, Coordinate(0, 2))
-        self.instantiate_object(Terrain, Rock, Coordinate(2, 2))
-        self.instantiate_object(Terrain, Rock, Coordinate(1, 2))
-
-        # self.instantiate_object(Terrain, Tree, Coordinate(2, 2))
-        # self.instantiate_object(Terrain, Tree, Coordinate(1, 2))
-
-        self.instantiate_object(Terrain, Grass, Coordinate(0, 3))
-        self.instantiate_object(Terrain, Grass, Coordinate(1, 3))
-        self.instantiate_object(Terrain, Grass, Coordinate(2, 3))
-        self.instantiate_object(Terrain, Grass, Coordinate(3, 3))
-        self.instantiate_object(Terrain, Grass, Coordinate(3, 2))
-        self.instantiate_object(Terrain, Grass, Coordinate(3, 1))
-        self.instantiate_object(Terrain, Grass, Coordinate(3, 0))
-
-        # self.instantiate_object(Animal, Herbivore, Coordinate(0, 3))
-
-        # self.instantiate_object(Terrain, Grass, Coordinate(0, 0))
-
-        # self.instantiate_object(Terrain, Rock, Coordinate(0, 1))
-        # self.instantiate_object(Terrain, Rock, Coordinate(0, 2))
-        # self.instantiate_object(Terrain, Rock, Coordinate(1, 0))
-        # self.instantiate_object(Terrain, Rock, Coordinate(1, 2))
-        # self.instantiate_object(Terrain, Rock, Coordinate(2, 1))
-        # self.instantiate_object(Terrain, Rock, Coordinate(2, 2))
-        # self.instantiate_object(Terrain, Rock, Coordinate(1, 1))
+        # self.instantiate_object(Animal, Herbivore, Coordinate(1, 0))
+        pass
 
 
     def get_object(self, graph_type, coordinate):
@@ -120,16 +80,12 @@ class SimulationMap:
                 return self.animal_graph[coordinate]
             case _:
                 raise ValueError("Wrong graph_type in SimulationMap.get_object()")
-    
-
-    # def is_coordinate_passable(self, coordinate):
-    #     if coordinate in self.terrain_graph and 
 
 
     @property
     def get_animals(self):
         return list(self.animal_graph.values())
-    
+
 
     @property
     def get_terrains(self):
@@ -144,7 +100,7 @@ class SimulationMap:
                 del self.animal_graph[coordinate]
             case _:
                 raise ValueError("Wrong graph_type in SimulationMap.del_object()")
-    
+
 
     def move_object(self, graph_type, coordinate, object_to_move):
         match graph_type.__name__:
@@ -166,7 +122,7 @@ class SimulationMap:
 
     def is_terrain_exists_at(self, coordinate):
         return coordinate in self.terrain_graph
-    
+
 
     def is_coordinate_exists_at(self, coordinate):
         return self.is_animal_exists_at(coordinate) or self.is_terrain_exists_at(coordinate)
@@ -192,13 +148,13 @@ class SimulationMap:
                neighbor_coordinates.append(cur_crd)
 
         return neighbor_coordinates
-    
+
 
     def count_instances_of(self, cls):
         all_objects = list(self.terrain_graph.values()) + list(self.animal_graph.values())
         found = [x for x in all_objects if isinstance(x, cls)]
         return len(found)
-    
+
 
     def find_neares_object_crd(self, start_crd, target_cls):
         def calc_distance(start_crd, target_crd):
@@ -220,12 +176,11 @@ class SimulationMap:
                 min_distance = calc_distance(start_crd, obj.crd)
         
         return res_crd
-            
-    
+
+
     @property
     def all_possible_coordinates(self):
         """
         Лист кортежей всех координат всех клеток поля
         """
         return [ Coordinate(*x) for x in itertools.product([*range(self.bd_size_row)], [*range(self.bd_size_col)]) ]
-    

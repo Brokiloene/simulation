@@ -6,7 +6,6 @@ from entities import Entity, Terrain, Rock
 from utils import AStar, Bfs
 
 
-
 class Animal(Entity):
     def __init__(self, coordinate, board_map, search_algorithm, speed=0) -> None:
         super().__init__(coordinate)
@@ -60,41 +59,6 @@ class Animal(Entity):
         self.map.move_object(Animal, new_coordinate, self)
         self.crd = new_coordinate
 
-    
-    def is_move_on_straight_line(self, crd_start, crd_dest):
-        return crd_start.row == crd_dest.row or crd_start.col == crd_dest.col \
-            or abs(crd_start.row - crd_start.col) == abs(crd_dest.row - crd_dest.col)
-
-
-    def is_move_on_straight_line_valid(self, crd_start, crd_dest):
-        def get_coordinates_between(crd_start, crd_dest):
-            res = []
- 
-            row_min = min(crd_start.row, crd_dest.row)
-            row_max = max(crd_start.row, crd_dest.row)
-            
-            col_min = min(crd_start.col, crd_dest.col)
-            col_max = max(crd_start.col, crd_dest.col)
-
-            if abs(crd_start.row - crd_start.col) == abs(crd_dest.row - crd_dest.col): 
-                for row, col in zip(range(row_min + 1, row_max + 1), range(col_min + 1, col_max + 1)):
-                    res.append(Coordinate(row, col))
-
-            elif crd_start.row == crd_dest.row:
-                for col in range(col_min + 1, col_max + 1):
-                    res.append(Coordinate(crd_start.row, col))
-            
-            elif crd_start.col == crd_dest.col:
-                for row in range(row_min + 1, row_max + 1):
-                    res.append(Coordinate(row, crd_start.col))
-            
-            return res
-
-        crds_between = get_coordinates_between(crd_start, crd_dest)
-
-        temp = [self.is_coordinate_free_to_move(crd) for crd in crds_between]
-        return all(temp)
-
 
     def find_optimal_coordinate_to_move(self, path_to_target):
         move_to_crd = None
@@ -103,10 +67,6 @@ class Animal(Entity):
         for ind in range(min(self.speed, len(path_to_target))):
             new_crd = path_to_target[ind]
             if new_crd in possible_moves and self.is_coordinate_free_to_move(new_crd):
-            # and \
-                # (not self.is_move_on_straight_line(self.crd, new_crd) or
-                #  self.is_move_on_straight_line_valid(self.crd, new_crd)):
-                
                 move_to_crd = new_crd
             else:
                 return move_to_crd
