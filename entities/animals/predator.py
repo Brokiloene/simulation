@@ -9,6 +9,7 @@ class Predator(Animal):
         self._sprite = ' P '
         self.target = Herbivore
 
+
     def is_coordinate_free_to_move(self, coordinate):
         is_passable = super().is_coordinate_free_to_move(coordinate)
 

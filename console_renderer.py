@@ -37,7 +37,7 @@ class SimulationConsoleRenderer:
 
         print(f"{msg} ", end='')
 
-        shift = self.calc_shift() - len(msg)
+        shift = max(self.calc_shift() - len(msg), 1)
         print(self.ANSI_BLINK + f"{action_msg: >{shift}}" + self.ANSI_RESET)
 
         print(' ',  *[' ' + str(x) + ' ' for x in range(self.map.bd_size_col)], sep='')

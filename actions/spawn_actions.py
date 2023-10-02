@@ -27,7 +27,7 @@ class SpawnHerbivore(SpawnAction):
 
         self.graph = Animal
         self.object_to_spawn = Herbivore
-        self.spawn_rate = int(self.map.bd_area ** 0.5)
+        self.spawn_rate = max(int(self.map.bd_area * 0.1), 1)
 
 
 class SpawnPredator(SpawnAction):
@@ -49,7 +49,7 @@ class SpawnGrass(SpawnAction):
         
         self.graph = Terrain
         self.object_to_spawn = Grass
-        self.spawn_rate = int(self.map.bd_area ** 0.5) * 3
+        self.spawn_rate = int(self.map.bd_area * 0.2)
 
 
 class SpawnRock(SpawnAction):
@@ -60,7 +60,7 @@ class SpawnRock(SpawnAction):
 
         self.graph = Terrain
         self.object_to_spawn = Rock
-        self.spawn_rate = int(self.map.bd_area ** 0.5) * 2
+        self.spawn_rate = int(self.map.bd_area * 0.25)
 
 
 class SpawnTree(SpawnAction):
@@ -71,5 +71,4 @@ class SpawnTree(SpawnAction):
 
         self.graph = Terrain
         self.object_to_spawn = Tree
-        self.spawn_rate = int(self.map.bd_area ** 0.5) * 2
-
+        self.spawn_rate = int(self.map.bd_area * 0.2)

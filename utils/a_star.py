@@ -1,5 +1,3 @@
-from utils.coordinate import Coordinate
-
 class AStar:
     @staticmethod
     def get_neigbors(coordinate, board_map):
